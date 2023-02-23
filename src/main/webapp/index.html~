@@ -1,0 +1,261 @@
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+		.results {
+		  display: flex;
+		  justify-content: space-between;
+		  flex-wrap: wrap;
+		  position: relative;
+		  padding: 0 10px;
+		}
+
+		.results img {
+		    width: 30%;
+		    padding: 10px;
+		}
+
+
+        .content {
+            text-align: center;
+        }
+
+		button {
+          border: black;
+          outline: none;
+          padding: 20px 16px;
+          background-color: #f1f1f1;
+          cursor: pointer;
+          font-size: 18px;
+          margin-top:10px;
+          text-align: center;
+		}
+
+		button:hover {
+            background-color: #ddd;
+        }
+
+        button.active {
+          background-color: #666;
+          color: white;
+        }
+
+        body {
+          font: 100%/1.5 Comfortaa, sans-serif;
+          color: hsl(300, 100%, 10%);
+          background-color: hsl(300, 100%, 98%);
+          vertical-align: middle;
+        }
+
+        h1 {
+          font-size: 1.75rem;
+          color: hsl(204, 100%, 29%);
+          margin: 1em 0  0.5em;
+          text-align: center;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          color: hsl(204, 100%, 29%);
+          margin: 1em 0 0.5em;
+        }
+
+        input {
+          padding: 12px 20px;
+          font-size: 1rem;
+          border-width: 1px;
+          border-style: solid;
+          border-radius: 10px;
+          border-color: hsl(204, 100%, 29%);
+          text-align: center;
+          outline: transparent;
+          width: 60%;
+          vertical-align: middle;
+        }
+
+        .removeDisplay {
+            display: none; /* Initially the hide the loading spinner */
+        }
+
+        #loading-spinner {
+          position: absolute; /* Position the spinner absolutely within the container */
+          top: 150%;
+          left: 48%;
+          transform: translate(-50%, -50%); /* Center the spinner vertically and horizontally */
+          border: 16px solid #f3f3f3;
+          border-top: 16px solid #344cdb;
+          border-radius: 50%;
+          width: 80px;
+          height: 80px;
+          animation: spin 2s linear infinite; /* Add the spinning animation */
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+<h1>Multithreaded web crawler for images</h1>
+
+<h2>Instructions: </h2>
+<ul>
+    <li>Enter the URL for the web-page you want to crawl</li>
+    <li>Pressing the submit button on this page will make a POST
+        request
+    </li>
+    <li>Once the results start to flow in, you will be able to see images categorized as GIFs, Icons/Logos, and just images
+    </li>
+    <li>You may change the URL and submit again to see a new set of results
+    </li>
+    <li>Have fun crawling!
+    </li>
+</ul>
+
+
+<div class="content">
+    <div class="input">
+        <form>
+            <input type="text" name="url" placeholder="Please enter a well-formed URL">
+        </form>
+        <button type="button">Submit!</button>
+    </div>
+    <div>
+        <button onclick="getAll()">All Images</button>
+        <button onclick="getIcons()">Only Icons</button>
+        <button onclick="getGifs()">Only GIFs</button>
+        <button onclick="getOnlyImages()">Only Images</button>
+    </div>
+    <div class="removeDisplay" id="loading-spinner"></div>
+    <div class="output">
+        <ul class="description"></ul>
+        <ul class="results"></ul>
+    </div>
+</div>
+<script>
+            var resultList = document.querySelector('ul.results');
+            var description = document.querySelector('ul.description');
+            var urlInput = document.querySelector('input[name=url]')
+
+            apiCallBack = function(xhr, callback) {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status != 200) {
+                        let message = xhr.status + ":" + xhr.statusText + ":"
+                                + xhr.responseText;
+                        alert(message);
+                        throw 'API call returned bad code: ' + xhr.status;
+                    }
+                    let response = xhr.responseText ? JSON.parse(xhr.responseText)
+                            : null;
+                    if (callback) {
+                        callback(response);
+                    }
+                    let spinner = document.getElementById("loading-spinner");
+                    spinner.classList.add("removeDisplay");
+                }
+            }
+
+            function getAll() {
+                let elements = document.getElementsByClassName("all")
+                for(let i = 0; i < elements.length; i++) {
+                    elements[i].style.display = "block"
+                }
+            }
+
+            function getIcons() {
+               let elements = document.getElementsByClassName("all")
+                for(let i = 0; i < elements.length; i++) {
+                    elements[i].style.display = "none"
+                }
+
+                let icons = document.getElementsByClassName("icons")
+                for(let i = 0; i < icons.length; i++) {
+                    icons[i].style.display = "block"
+                }
+            }
+
+            function getGifs() {
+                let elements = document.getElementsByClassName("all")
+                for(let i = 0; i < elements.length; i++) {
+                    elements[i].style.display = "none"
+                }
+                let gifs = document.getElementsByClassName("gifs")
+                for(let i = 0; i < gifs.length; i++) {
+                    gifs[i].style.display = "block"
+                }
+            }
+
+            function getOnlyImages() {
+                 let elements = document.getElementsByClassName("all")
+                for(let i = 0; i < elements.length; i++) {
+                    elements[i].style.display = "none"
+                }
+                let images = document.getElementsByClassName("images")
+                for(let i = 0; i < images.length; i++) {
+                    images[i].style.display = "block"
+
+                }
+            }
+
+            updateList = function(response) {
+                resultList.innerHTML = '';
+                description.innerHTML = '';
+
+                for (const imgType in response) {
+<!--                    if the resultMap key is description, display it as text-->
+                    if(imgType == "Description") {
+                        var textNode = document.createTextNode("A little bit about the site: " + response[imgType][0]);
+                        description.appendChild(textNode);
+                        continue;
+                    }
+
+                    for (var i = 0; i < response[imgType].length; i++) {
+                        var img = document.createElement("img");
+
+<!--                        Giving different class names to the different arrays for easier referencing-->
+                        img.src = response[imgType][i];
+                        if(imgType == "GIFs") {
+                            img.className = "column gifs all"
+                        } else if(imgType == "Icons") {
+                            img.className = "column icons all"
+                        } else if(imgType == "Images") {
+                            img.className = "column images all"
+                        }
+
+                        resultList.appendChild(img);
+
+                    }
+                }
+<!--                Handling response from pages that don't have images-->
+                if(response['GIFs'].length == 0 && response['Icons'].length == 0 && response['Images'].length == 0) {
+                    var textNode = document.createTextNode("This page does not have any images");
+                    resultList.appendChild(textNode);
+                }
+
+            }
+
+            makeApiCall = function(url, method, obj, callback) {
+                let xhr = new XMLHttpRequest();
+                xhr.open(method, url);
+                xhr.onreadystatechange = apiCallBack.bind(null, xhr, callback);
+                xhr.send(obj ? obj instanceof FormData || obj.constructor == String ? obj : JSON.stringify(obj) : null);
+            }
+
+            document.querySelector('button').addEventListener("click", function(event) {
+                event.preventDefault();
+                resultList.innerHTML = '';
+                description.innerHTML = '';
+
+<!--                Making the spinner visible after the request is sent and before the images start loading-->
+                let spinner = document.getElementById("loading-spinner");
+                spinner.classList.remove("removeDisplay");
+                makeApiCall('/main?url=' + urlInput.value, 'POST', null, updateList);
+            });
+
+</script>
+</body>
+
+</html>

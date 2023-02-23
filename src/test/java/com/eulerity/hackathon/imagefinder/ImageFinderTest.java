@@ -23,7 +23,7 @@ public class ImageFinderTest {
     public HttpSession session;
 
     private static final String INVALID_URL = "invalid_url";
-    private static final String TEST_URL = "https://www.eulerity.com/";
+    private static final String TEST_URL = "https://www.google.com/";
 
     @Before
     public void setUp() throws Exception {

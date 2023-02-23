@@ -38,3 +38,6 @@ To run the project, use the following command to start the server:
 
 You should see a line at the bottom that says "Started Jetty Server". Now, if you enter `localhost:8080` into your browser, you should see the `index.html` welcome page!
 
+###Testing
+- I have added two JUnits to test the fail and success cases
+- I have also provided a test-links.txt that lists down most of the sites I used to test the crawler

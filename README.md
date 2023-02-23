@@ -1,4 +1,6 @@
-## Problem Statement
+## Multithreaded web crawler for images
+
+### Problem Statement
 The goal of this task is to perform a web crawl on a URL string provided by the user. From the crawl, we need to parse out all of the images on that web page and return a JSON array of strings that represent the URLs of all images on the page. [Jsoup](https://jsoup.org/) is a great basic library for crawling and is already included as a maven dependency in this project.
 
 ### Functionality Implemented
@@ -38,6 +40,6 @@ To run the project, use the following command to start the server:
 
 You should see a line at the bottom that says "Started Jetty Server". Now, if you enter `localhost:8080` into your browser, you should see the `index.html` welcome page!
 
-###Testing
+### Testing
 - I have added two JUnits to test the fail and success cases
 - I have also provided a test-links.txt that lists down most of the sites I used to test the crawler
